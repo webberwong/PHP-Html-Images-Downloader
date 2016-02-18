@@ -1,0 +1,35 @@
+{
+    "name": "hwl/html-images-downloader",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hwl",
+            "email": "weigewong@gmail.com"
+        }
+    ],
+    "description" : "解析html源,提取图片标签地址,下载图片并处理图片",
+    "keywords" : ["image","download","html"],
+    "minimum-stability": "dev",
+    "require": {
+        "intervention/image": "^2.3",
+        "paquettg/php-html-parser": "^1.6",
+        "symfony/filesystem": "2.8.2",
+        "curl/curl": "^1.3",
+        "alchemy/zippy": "^0.3.5"
+    },
+    "repositories": [
+        {
+            "packagist": false
+        },
+        {
+            "type": "composer",
+            "url": "http://packagist.cn"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Hwl\\HtmlImageDownloader\\": "src/"
+        }
+    }
+}
