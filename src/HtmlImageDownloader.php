@@ -55,7 +55,7 @@ class HtmlImageDownloader{
         foreach($imgUrls as $key => $url){
             $savePath = $this->saveFolder . $key . '.jpg';
             //$imagesStatus = $this->resizeReducePixel($url,1,$savePath);
-            $imagesStatus = $this->resizeConstraintWidth($url,750,$savePath);
+            $imagesStatus[] = $this->resizeConstraintWidth($url,750,$savePath);
         }
 
         $this->imgLists = $imagesStatus;
@@ -189,7 +189,12 @@ class HtmlImageDownloader{
      */
     public function compressImagesFile($savePath = '',$compressFolderPath = ''){
         $compressor = Zippy::load();
-        $zip = $compressor->create($savePath,array('NewImages' => $compressFolderPath));
+        $folderName = 'NewImages';
+        $filename   = pathinfo($savePath);
+        if(isset($filename['filename']) && $filename['filename'] != ''){
+            $folderName = $filename['filename'];
+        }
+        $zip = $compressor->create($savePath,array($folderName => $compressFolderPath));
         return $savePath;
     }
 
