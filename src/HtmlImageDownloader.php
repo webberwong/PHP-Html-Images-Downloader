@@ -54,7 +54,8 @@ class HtmlImageDownloader{
 
         foreach($imgUrls as $key => $url){
             $savePath = $this->saveFolder . $key . '.jpg';
-            $imagesStatus = $this->resizeReducePixel($url,1,$savePath);
+            //$imagesStatus = $this->resizeReducePixel($url,1,$savePath);
+            $imagesStatus = $this->resizeConstraintWidth($url,750,$savePath);
         }
 
         $this->imgLists = $imagesStatus;
@@ -73,7 +74,7 @@ class HtmlImageDownloader{
         $curl = new Curl();
         $curl->get($url);
         if ($curl->error) {
-            echo false;
+            return false;
         }
         else {
             return $curl->response;
@@ -113,6 +114,43 @@ class HtmlImageDownloader{
 
 
         return $status;
+    }
+
+    /**
+     * 下载并重置图片,约束宽高比
+     * @param string $url
+     * @param int $width
+     * @param string $savePath
+     * @return array
+     */
+    public function resizeConstraintWidth($url,$width = 1,$savePath){
+        $status = array(
+            'url'      => $url,
+            'download' => 0,
+            'savePath' => ''
+        );
+
+        if(strpos($url,'http') !== false){
+            $imgData = $this->downloadImage($url);
+            //如果成功下载文件
+            if($imgData !== false){
+                $status['download'] =  1 ;
+
+                $imgObj = ImageHandler::make($imgData);
+                $iw = $imgObj->getWidth();
+                //如果原始图片小于后面设置的调试,则不调整图片
+                if($width < $iw){
+                    $imgObj->widen($width);
+                }
+                $imgObj->save($savePath);
+
+                $status['savePath'] = $savePath;
+            }
+
+        }
+
+        return $status;
+
     }
 
     /**
