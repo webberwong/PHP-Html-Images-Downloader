@@ -21,7 +21,12 @@ HTML;
     }
 
     public function testProcessing(){
-        $this->downloader->processing($this->testHtml);
+        $testArray = array(
+            'https://img.weiyemingtong.com/imgextra/i3/2258348879/TB2Msz3bXXXXXbJXXXXXXXXXXXX_!!2258348879.jpg',
+            'https://img.weiyemingtong.com/imgextra/i4/2258348879/TB22LYWjpXXXXXTXpXXXXXXXXXX_!!2258348879.jpg',
+        );
+        //替换成数组进行测试,也可以使用$this->testHtml来测试
+        $this->downloader->processing($testArray);
     }
 
     public function testParseHtmlStringToImageUrl(){
@@ -45,7 +50,7 @@ HTML;
         //该目录必须需要,不存在需要手动创建
         $savePath   = $ROOT . 'tests/compressZips/test.zip';
         $targetPath = $ROOT . 'images/';
-        $this->downloader->compressImagesFile($savePath,$targetPath);
+        $this->downloader->compressImagesFile($savePath,$targetPath,'根文件夹名称');
 
         $this->assertFileExists($savePath);
     }

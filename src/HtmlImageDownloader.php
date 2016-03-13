@@ -44,12 +44,18 @@ class HtmlImageDownloader{
     /**
      * 处理并下载并重置大小图片
      * 暂只提供一种图片宽高同等缩小
-     * @param string $html
+     * @param string|array $html
      * @return array
      */
     public function processing($html){
         $this->createSaveFolder();
-        $imgUrls = self::parseHtmlStringToImageUrl($html);
+        //如果是数组,则直接使用数组,不是则用html字符串来解析
+        if(is_array($html)){
+            $imgUrls = $html;
+        }else{
+            $imgUrls = self::parseHtmlStringToImageUrl($html);
+        }
+
         $imagesStatus = array();
 
         foreach($imgUrls as $key => $url){
@@ -185,15 +191,19 @@ class HtmlImageDownloader{
      * 压缩图片文件
      * @param string $savePath 压缩成功后保存的路径,需要包含生成的压缩包名称,文件夹不存在需手动创建
      * @param string $compressFolderPath 压缩目标文件夹路径
+     * @param string $rootFolderName 压缩包的根目录文件夹名称
      * @return string
      */
-    public function compressImagesFile($savePath = '',$compressFolderPath = ''){
+    public function compressImagesFile($savePath = '',$compressFolderPath = '',$rootFolderName = ''){
         $compressor = Zippy::load();
-        $folderName = 'NewImages';
-        $filename   = pathinfo($savePath);
-        if(isset($filename['filename']) && $filename['filename'] != ''){
-            $folderName = $filename['filename'];
+        $folderName = $rootFolderName;
+        if(!is_string($folderName) OR $folderName == ''){
+            $filename   = pathinfo($savePath);
+            if(isset($filename['filename']) && $filename['filename'] != ''){
+                $folderName = $filename['filename'];
+            }
         }
+
         $zip = $compressor->create($savePath,array($folderName => $compressFolderPath));
         return $savePath;
     }
