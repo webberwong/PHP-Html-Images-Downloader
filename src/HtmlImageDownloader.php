@@ -45,9 +45,10 @@ class HtmlImageDownloader{
      * 处理并下载并重置大小图片
      * 暂只提供一种图片宽高同等缩小
      * @param string|array $html
+     * @param int $width 图片宽度限制
      * @return array
      */
-    public function processing($html){
+    public function processing($html,$width = 750){
         $this->createSaveFolder();
         //如果是数组,则直接使用数组,不是则用html字符串来解析
         if(is_array($html)){
@@ -55,13 +56,15 @@ class HtmlImageDownloader{
         }else{
             $imgUrls = self::parseHtmlStringToImageUrl($html);
         }
+        //保证一个尺寸
+        $width = is_numeric($width) ? intval($width) : 750;
 
         $imagesStatus = array();
 
         foreach($imgUrls as $key => $url){
             $savePath = $this->saveFolder . $key . '.jpg';
             //$imagesStatus = $this->resizeReducePixel($url,1,$savePath);
-            $imagesStatus[] = $this->resizeConstraintWidth($url,750,$savePath);
+            $imagesStatus[] = $this->resizeConstraintWidth($url,$width,$savePath);
         }
 
         $this->imgLists = $imagesStatus;
