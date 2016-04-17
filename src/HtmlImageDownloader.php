@@ -81,6 +81,8 @@ class HtmlImageDownloader{
     public function downloadImage($url){
         //return file_get_contents($url);
         $curl = new Curl();
+        //SSL证书不校验
+        $curl->setOpt(CURLOPT_SSL_VERIFYPEER,false);
         $curl->get($url);
         if ($curl->error) {
             return false;
