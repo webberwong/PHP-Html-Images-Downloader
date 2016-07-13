@@ -28,6 +28,15 @@ class HtmlImageDownloader{
 
     private $imgLists = array();
 
+    /**
+     * 允许的图片扩展名
+     * 使用的Intervention/Image库里环境一般为gd库,仅支持jpg,gif,png格式
+     * @var array
+     */
+    private $imgExts = array(
+        'jpg','jpeg','gif','png'
+    );
+
 
     /**
      * HtmlImageDownloader constructor.
@@ -62,9 +71,22 @@ class HtmlImageDownloader{
         $imagesStatus = array();
 
         foreach($imgUrls as $key => $url){
-            $savePath = $this->saveFolder . $key . '.jpg';
+            //判断数组里是否还有数组[url,fileName,extName]
+            if(is_array($url)){
+                //如果指定了文件名,则不使用序号做文件名
+                $fileName = isset($url['fileName']) && $url['fileName'] ? $url['fileName'] : $key;
+                $savePath = $this->saveFolder . $fileName . '.'
+                    . $this->getImageFileExt($url['url'],$url['extName']);
+
+                $imagesStatus[] = $this->resizeConstraintWidth($url['url'],$width,$savePath);
+            }else{
+                //使用序号做文件名
+                $savePath = $this->saveFolder . $key . '.' . $this->getImageFileExt($url);
+                $imagesStatus[] = $this->resizeConstraintWidth($url,$width,$savePath);
+            }
+            //重置图片大小,宽高各自减少像素
             //$imagesStatus = $this->resizeReducePixel($url,1,$savePath);
-            $imagesStatus[] = $this->resizeConstraintWidth($url,$width,$savePath);
+
         }
 
         $this->imgLists = $imagesStatus;
@@ -232,5 +254,32 @@ class HtmlImageDownloader{
             return $this->saveFolder;
         }
         return __DIR__ . '/' . $this->saveFolder;
+    }
+
+    /**
+     * 获取图片文件里的扩展名
+     * @param string $filePath 文件路径或文件名(需要加上扩展名)
+     * @param string $extName 文件扩展名(如果指定的扩展名不在允许的扩展名列表里,则使用默认jpg)
+     * @return string
+     */
+    public function getImageFileExt($filePath,$extName = 'jpg'){
+        $fileExt = pathinfo($filePath,PATHINFO_EXTENSION);
+        if($fileExt){
+            $extName = $fileExt;
+        }
+        $extName = strtolower($extName);
+        //如果不在支持的扩展名里,则使用jpg
+        if(!in_array($extName,$this->imgExts)){
+            $extName = 'jpg';
+        }
+        return $extName;
+    }
+
+    /**
+     * 设置图片扩展名集
+     * @param array $exts
+     */
+    public function setImageExts($exts){
+        $this->imgExts = $exts;
     }
 }
